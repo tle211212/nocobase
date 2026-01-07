@@ -10,6 +10,11 @@
 export const string = [
   { label: '{{t("contains")}}', value: '$includes', selected: true },
   { label: '{{t("does not contain")}}', value: '$notIncludes' },
+  { label: '{{t("starts with")}}', value: '$startsWith' },
+  { label: '{{t("not starts with")}}', value: '$notStartsWith' },
+  { label: '{{t("ends with")}}', value: '$endWith' },
+  { label: '{{t("not ends with")}}', value: '$notEndWith' },
+  { label: '{{t("is a prefix of")}}', value: '$isPrefixOf' },
   { label: '{{t("is")}}', value: '$eq' },
   { label: '{{t("is not")}}', value: '$ne' },
   { label: '{{t("is empty")}}', value: '$empty', noValue: true },
@@ -310,6 +315,46 @@ export const bigField = [
   {
     label: '{{t("does not contain")}}',
     value: '$notIncludes',
+    schema: {
+      type: 'string',
+      'x-component': 'Input',
+    },
+  },
+  {
+    label: '{{t("starts with")}}',
+    value: '$startsWith',
+    schema: {
+      type: 'string',
+      'x-component': 'Input',
+    },
+  },
+  {
+    label: '{{t("not starts with")}}',
+    value: '$notStartsWith',
+    schema: {
+      type: 'string',
+      'x-component': 'Input',
+    },
+  },
+  {
+    label: '{{t("ends with")}}',
+    value: '$endWith',
+    schema: {
+      type: 'string',
+      'x-component': 'Input',
+    },
+  },
+  {
+    label: '{{t("not ends with")}}',
+    value: '$notEndWith',
+    schema: {
+      type: 'string',
+      'x-component': 'Input',
+    },
+  },
+  {
+    label: '{{t("is a prefix of")}}',
+    value: '$isPrefixOf',
     schema: {
       type: 'string',
       'x-component': 'Input',

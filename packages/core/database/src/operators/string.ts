@@ -170,4 +170,28 @@ export default {
 
     return getFieldExpression(`%${escapeLike(value)}`, ctx, isPg(ctx) ? 'NOT ILIKE' : 'NOT LIKE');
   },
+
+  $isPrefixOf(value, ctx) {
+    if (value === null) {
+      return {
+        [Op.is]: null,
+      };
+    }
+
+    const fieldName = getFieldName(ctx);
+    const queryInterface = ctx.db.sequelize.getQueryInterface();
+    const quotedField = queryInterface.quoteIdentifiers(fieldName);
+    const escapedValue = ctx.db.sequelize.escape(value);
+
+    if (isPg(ctx)) {
+      // PostgreSQL: 'value' ILIKE CAST(field AS TEXT) || '%'
+      return Sequelize.literal(`${escapedValue} ILIKE CAST(${quotedField} AS TEXT) || '%'`);
+    } else if (ctx.db.sequelize.getDialect() === 'mysql' || ctx.db.sequelize.getDialect() === 'mariadb') {
+      // MySQL/MariaDB: 'value' LIKE CONCAT(field, '%')
+      return Sequelize.literal(`${escapedValue} LIKE CONCAT(${quotedField}, '%')`);
+    } else {
+      // SQLite: 'value' LIKE field || '%'
+      return Sequelize.literal(`${escapedValue} LIKE ${quotedField} || '%'`);
+    }
+  },
 } as Record<string, any>;
