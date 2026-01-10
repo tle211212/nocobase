@@ -181,17 +181,31 @@ export default {
     const fieldName = getFieldName(ctx);
     const queryInterface = ctx.db.sequelize.getQueryInterface();
     const quotedField = queryInterface.quoteIdentifiers(fieldName);
-    const escapedValue = ctx.db.sequelize.escape(value);
 
-    if (isPg(ctx)) {
-      // PostgreSQL: 'value' ILIKE CAST(field AS TEXT) || '%'
-      return Sequelize.literal(`${escapedValue} ILIKE CAST(${quotedField} AS TEXT) || '%'`);
-    } else if (ctx.db.sequelize.getDialect() === 'mysql' || ctx.db.sequelize.getDialect() === 'mariadb') {
-      // MySQL/MariaDB: 'value' LIKE CONCAT(field, '%')
-      return Sequelize.literal(`${escapedValue} LIKE CONCAT(${quotedField}, '%')`);
-    } else {
-      // SQLite: 'value' LIKE field || '%'
-      return Sequelize.literal(`${escapedValue} LIKE ${quotedField} || '%'`);
+    // Helper function to create SQL literal for a single value
+    const createCondition = (singleValue) => {
+      const escapedValue = ctx.db.sequelize.escape(singleValue);
+
+      if (isPg(ctx)) {
+        // PostgreSQL: 'value' ILIKE CAST(field AS TEXT) || '%'
+        return Sequelize.literal(`${escapedValue} ILIKE CAST(${quotedField} AS TEXT) || '%'`);
+      } else if (ctx.db.sequelize.getDialect() === 'mysql' || ctx.db.sequelize.getDialect() === 'mariadb') {
+        // MySQL/MariaDB: 'value' LIKE CONCAT(field, '%')
+        return Sequelize.literal(`${escapedValue} LIKE CONCAT(${quotedField}, '%')`);
+      } else {
+        // SQLite: 'value' LIKE field || '%'
+        return Sequelize.literal(`${escapedValue} LIKE ${quotedField} || '%'`);
+      }
+    };
+
+    // Handle array values - if ANY value in the array is prefixed by the field, it's a match
+    if (Array.isArray(value)) {
+      const conditions = value.map(createCondition);
+      return {
+        [Op.or]: conditions,
+      };
     }
+
+    return createCondition(value);
   },
 } as Record<string, any>;
