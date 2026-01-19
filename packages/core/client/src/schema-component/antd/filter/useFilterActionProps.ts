@@ -75,10 +75,10 @@ export const useGetFilterFieldOptions = () => {
           return !operator?.visible || operator.visible(field);
         }) || [],
     };
-    if (field.target && depth > 2) {
+    if (field.target && depth > 3) {
       return;
     }
-    if (depth > 2) {
+    if (depth > 3) {
       return option;
     }
     if (children?.length) {
@@ -134,10 +134,10 @@ const field2option = (field, depth, nonfilterable, dataSourceManager, collection
         return !operator?.visible || operator.visible(field);
       }) || [],
   };
-  if (field.target && depth > 2) {
+  if (field.target && depth > 3) {
     return;
   }
-  if (depth > 2) {
+  if (depth > 3) {
     return option;
   }
   if (children?.length) {
